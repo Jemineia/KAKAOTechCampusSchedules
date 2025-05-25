@@ -2,6 +2,8 @@ package com.example.calendarproject.service;
 
 import com.example.calendarproject.dto.ScheduleRequestDTO;
 import com.example.calendarproject.dto.ScheduleResponseDTO;
+import com.example.calendarproject.exception.PasswordMismatchException;
+import com.example.calendarproject.exception.ScheduleNotFoundException;
 import com.example.calendarproject.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,21 +29,27 @@ public class ScheduleService {
         return repo.findById(id);
     }
 
-    public boolean update(int id, ScheduleRequestDTO dto) throws Exception {
+    public void update(int id, ScheduleRequestDTO dto) throws Exception {
         String dbPassword = repo.findPasswordById(id);
-        if (dbPassword != null && dbPassword.equals(dto.getPassword())) {
-            repo.update(id, dto);
-            return true;
+        if (dbPassword == null) {
+            throw new ScheduleNotFoundException("해당 일정이 존재하지 않습니다.");
         }
-        return false;
+
+        if (!dbPassword.equals(dto.getPassword())) {
+            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
+        }
+
+        repo.update(id, dto);
     }
 
-    public boolean delete(int id, String password) throws Exception {
+    public void delete(int id, String password) throws Exception {
         String dbPassword = repo.findPasswordById(id);
-        if (dbPassword != null && dbPassword.equals(password)) {
-            repo.delete(id);
-            return true;
+        if (dbPassword == null) {
+            throw new ScheduleNotFoundException("해당 일정이 존재하지 않습니다.");
         }
-        return false;
+        if (!dbPassword.equals(password)) {
+            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
+        }
+        repo.delete(id);
     }
 }

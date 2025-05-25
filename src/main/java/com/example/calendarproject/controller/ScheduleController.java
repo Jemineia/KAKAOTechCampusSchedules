@@ -38,16 +38,14 @@ public class ScheduleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable int id, @RequestBody ScheduleRequestDTO dto) throws Exception {
-        boolean updated = service.update(id, dto);
-        return updated ? ResponseEntity.ok("일정이 수정되었습니다.")
-                : ResponseEntity.status(403).body("비밀번호가 일치하지 않습니다.");
+    public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid ScheduleRequestDTO dto) throws Exception {
+        service.update(id, dto);
+        return ResponseEntity.ok("일정이 수정되었습니다.");
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable int id, @RequestBody ScheduleRequestDTO dto) throws Exception {
-        boolean deleted = service.delete(id, dto.getPassword());
-        return deleted ? ResponseEntity.ok("일정이 삭제되었습니다.")
-                : ResponseEntity.status(403).body("비밀번호가 일치하지 않습니다.");
+        service.delete(id, dto.getPassword());
+        return ResponseEntity.ok("일정이 삭제되었습니다");
     }
 }
